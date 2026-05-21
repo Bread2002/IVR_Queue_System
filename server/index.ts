@@ -95,7 +95,7 @@ async function findAgent(
   return matched;
 }
 
-// Helpful function to calculate the current position of a call in the waiting queue based on its ID
+// Define a helper function to calculate the position of a call in the queue based on its ID
 async function getPosition(callId: number): Promise<number> {
   // Prepare and execute an SQL query to count how many calls are ahead of the given call ID
   const row: any = await (
@@ -106,6 +106,17 @@ async function getPosition(callId: number): Promise<number> {
 
   // Return the calculated position
   return row.pos;
+}
+
+// Define a helper function to estimate the wait time in minutes based on the created_at timestamp of a call
+function estimatedWaitMinutes(createdAt: string): number {
+  return Math.max(
+    1,
+    Math.round(
+      (Date.now() - new Date(createdAt.replace(" ", "T") + "Z").getTime()) /
+        60000,
+    ),
+  );
 }
 
 // Define a route for the root URL that sends a welcome message
@@ -172,7 +183,11 @@ app.post("/api/queue", async (req, res) => {
   ).get(result.lastInsertRowid);
   const position = await getPosition(call.id);
 
-  res.json({ ...call, position, estimated_wait: position * 4 });
+  res.json({
+    ...call,
+    position,
+    estimated_wait: estimatedWaitMinutes(call.created_at),
+  });
 });
 
 // Define a route for the API endpoint that returns the current call queue
@@ -197,7 +212,8 @@ app.get("/api/queue", async (req, res) => {
     return {
       ...row,
       position: row.status === "waiting" ? position : null,
-      estimated_wait: row.status === "waiting" ? position * 4 : null,
+      estimated_wait:
+        row.status === "waiting" ? estimatedWaitMinutes(row.created_at) : null,
     };
   });
 
@@ -238,7 +254,8 @@ app.get("/api/queue/next", async (req, res) => {
 
   if (!next)
     return res.status(404).json({ error: "No callers currently waiting" });
-  res.json(next);
+
+  res.json({ ...next, estimated_wait: estimatedWaitMinutes(next.created_at) });
 });
 
 // Define a route for the API endpoint that allows verifying a call (write access)
