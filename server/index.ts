@@ -284,11 +284,11 @@ app.patch("/api/queue/:id/complete", async (req, res) => {
 });
 
 // Start the server and listen on the specified port
-if (process.env.NODE_ENV === "development") {
-  app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
-  });
-}
+// if (process.env.NODE_ENV === "development") {
+app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
+});
+// }
 
 // Export the Express application for use in other modules
-export default app;
+// export default app;
