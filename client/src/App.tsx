@@ -28,9 +28,8 @@ type QueueCall = {
   estimated_wait: number | null
 }
 
-// Define a type for the result returned after submitting a call
-type SubmitResult = {
-  call: QueueCall
+// Define a type for the result returned after submitting a call (call fields are flattened alongside position/wait)
+type SubmitResult = QueueCall & {
   position: number
   estimated_wait: number
 }
@@ -58,7 +57,7 @@ function App() {
   useEffect(() => {
     fetch(`${API}/api/departments`)  // Fetch the list of departments from the API
       .then(r => r.json())  // Parse the response as JSON
-      .then(data => setDepartments(data.departments))  // Update the state with the list of departments
+      .then(data => setDepartments(data))  // Update the state with the list of departments
       .catch(console.error)  // Log any errors to the console
   }, [])
 
@@ -73,7 +72,7 @@ function App() {
     try {
       const r = await fetch(`${API}/api/queue?status=waiting,in-progress`)  // Submit a GET request for the queue data
       if (!r.ok) throw new Error(`HTTP Error ${r.status}`)  // Throw an error if the response is not OK
-      setQueue((await r.json()).calls)  // Update the state with the fetched queue data
+      setQueue(await r.json())  // Update the state with the fetched queue data
     } catch (err) { console.error(err) }  // Log any errors to the console
     finally { setQueueLoading(false) }  // Set loading state back to false after the fetch is complete
   }
@@ -269,7 +268,7 @@ function App() {
             <div className="confirmation-card">
               <p className="confirm-icon">✓</p>
               <h2>You're in the queue</h2>
-              <p className="confirm-dept">{submitResult.call.department}</p>
+              <p className="confirm-dept">{submitResult.department}</p>
               <div className="confirm-stats">
                 <div>
                   <span className="stat-label">Position</span>
@@ -282,7 +281,7 @@ function App() {
               </div>
               <p className="confirm-agent">
                 Assigned to{' '}
-                <strong>{submitResult.call.assigned_agent_name ?? 'Next available agent'}</strong>
+                <strong>{submitResult.assigned_agent_name ?? 'Next available agent'}</strong>
               </p>
               <button className="button-icon" onClick={() => setSubmitResult(null)}>
                 Submit Another Call

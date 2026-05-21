@@ -6,7 +6,7 @@ function parseJsonString(str) {
 }
 
 // Define the base URL for the API endpoint
-const baseURL = "https://localhost:3000/api/queue/next";  // Change to deploy URL when actully testing
+const baseURL = "https://ivr-queue-system.vercel.app/api/queue/next";
 
 // Create properties and a StringBuffer to hold the response body
 const props = Props:createPropertiesClone();
@@ -52,9 +52,9 @@ response = json;
 setResultValue("web_response", json);
 
 // Log the parsed call for debugging purposes
-Log:info("call: " + json);
-Log:info("name: " + json.name);
-Log:info("account number: " + json.account_number);
-Log:info("status: " + json.status);
-Log:info("position: " + json.position);
-Log:info("EWT: " + json.estimated_wait);
+Log:info("call: " + json.call);
+Log:info("name: " + json.call.caller_name);
+Log:info("account number: " + json.call.account_number);
+Log:info("status: " + json.call.status);
+Log:info("position: " + json.call.position);
+Log:info("EWT: " + json.call.estimated_wait);
