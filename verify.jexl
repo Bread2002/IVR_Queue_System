@@ -52,9 +52,5 @@ response = json;
 setResultValue("web_response", json);
 
 // Log the parsed call for debugging purposes
-Log:info("call: " + json.call);
-Log:info("name: " + json.call.caller_name);
-Log:info("account number: " + json.call.account_number);
-Log:info("status: " + json.call.status);
-Log:info("position: " + json.call.position);
-Log:info("EWT: " + json.call.estimated_wait);
+var msg = "\n************************************************\nName: " + json.caller_name + "\nAccount Number: " + json.account_number + "\nStatus: " + json.status + "\nEWT: " + json.estimated_wait + " minutes\nFull Call Details: " + json + "\n************************************************";
+Log:info(msg);
