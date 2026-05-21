@@ -1,3 +1,60 @@
-PATCH http://localhost:3000/api/queue/2/verify?verified=true
+# This file contains example REST API requests for testing the queue management system.
+
+### Root (welcome)
+GET http://localhost:3000/
 ###
+
+### Hello (simple greeting)
+GET http://localhost:3000/api/hello
+###
+
+### Team members (all)
+GET http://localhost:3000/api/team
+###
+
+### Departments (unique list)
+GET http://localhost:3000/api/departments
+###
+
+### Get caller by account number
+GET http://localhost:3000/api/callers/ACCT12345
+###
+
+### Add a new call to the queue
+POST http://localhost:3000/api/queue
+Content-Type: application/json
+
+{
+	"accountNumber": "ACCT-1234",
+	"department": "Support",
+	"issue": "I had a question about my recent billing statement."
+}
+###
+
+### Get full queue (all statuses)
+GET http://localhost:3000/api/queue
+###
+
+### Get queue filtered by status (comma-separated)
+GET http://localhost:3000/api/queue?status=waiting,completed
+###
+
+### Get the next waiting caller (global)
+GET http://localhost:3000/api/queue/next
+###
+
+### Get the next waiting caller for a department
+GET http://localhost:3000/api/queue/next?department=support
+###
+
+### Verify a queued call (mark in-progress) - verified = true
+PATCH http://localhost:3000/api/queue/1/verify?verified=true
+###
+
+### Verify a queued call (reject) - verified = false
+PATCH http://localhost:3000/api/queue/1/verify?verified=false
+###
+
+### Mark an in-progress call as completed
 PATCH http://localhost:3000/api/queue/1/complete
+###
