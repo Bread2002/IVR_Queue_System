@@ -1,0 +1,60 @@
+// Define a helper function to parse JSON strings
+function parseJsonString(str) {
+    return str.startsWith('[') ?
+        JsonUtils:parseJsonListString(str) :
+        JsonUtils:parseJsonMapString(str);
+}
+
+// Define the base URL for the API endpoint
+const baseURL = "https://localhost:3000/api/queue/next";  // Change to deploy URL when actully testing
+
+// Create properties and a StringBuffer to hold the response body
+const props = Props:createPropertiesClone();
+const resultBody = new('java.lang.StringBuffer');
+
+/*
+const responseCode = HttpUtils:post(
+    props,
+    baseURL,
+    null, // basic auth user
+    null, // basic auth pass
+    null,
+    "application/json",
+    "{}",
+    resultBody
+);
+*/
+
+// Access the next caller in the queue
+const responseCode = HttpUtils:get(
+    props,
+    baseURL,
+    null,
+    null,
+    null,
+    resultBody
+);
+
+// Check if the response code indicates success
+if (responseCode != 200) {
+    Log:info("request failed with status code: " + responseCode);
+    Log:info(resultBody.toString());
+    return   
+}
+
+// Parse the response body as JSON and log the results
+const resultStr = resultBody.toString();
+Log:info(resultStr);
+
+// Parse the JSON response and set it as the web response
+const json = parseJsonString(resultStr);
+response = json;
+setResultValue("web_response", json);
+
+// Log the parsed call for debugging purposes
+Log:info("call: " + json);
+Log:info("name: " + json.name);
+Log:info("account number: " + json.account_number);
+Log:info("status: " + json.status);
+Log:info("position: " + json.position);
+Log:info("EWT: " + json.estimated_wait);
