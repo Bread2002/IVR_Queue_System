@@ -42,12 +42,12 @@ async function findAgent(
     ? await (
         await db.prepare("SELECT * FROM team_members WHERE department = ?")
       ).all([department])
-    : await db.execute("SELECT * FROM team_members");
+    : await db.all("SELECT * FROM team_members");
 
   // If no candidates are found for the specified department,
   if (candidates.length === 0)
     // Fall back to considering all agents
-    candidates = await db.execute("SELECT * FROM team_members");
+    candidates = await db.all("SELECT * FROM team_members");
 
   // Define variables for tracking the best matched agent and the highest score
   const words = (issue || "")
@@ -113,12 +113,12 @@ app.get("/api/hello", async (_, res) => {
 
 // Define a route for the API endpoint that returns all team members from the database
 app.get("/api/team", async (_, res) => {
-  res.json({ team: await db.execute("SELECT * FROM team_members") });
+  res.json({ team: await db.all("SELECT * FROM team_members") });
 });
 
 // Define a route for the API endpoint that returns all unique departments from the team members in the database
 app.get("/api/departments", async (_, res) => {
-  const rows = await db.execute(
+  const rows = await db.all(
     "SELECT DISTINCT department FROM team_members ORDER BY department",
   );
   res.json({ departments: rows.map((r: any) => r.department) });
@@ -180,9 +180,9 @@ app.get("/api/queue", async (req, res) => {
       await db.prepare(
         `SELECT * FROM call_queue WHERE status IN (${placeholders}) ORDER BY created_at ASC`,
       )
-    ).all(...statuses);
+    ).all(statuses);
   } else {
-    rows = await db.execute("SELECT * FROM call_queue ORDER BY created_at ASC");
+    rows = await db.all("SELECT * FROM call_queue ORDER BY created_at ASC");
   }
 
   const enriched = rows.map(async (row: any) => {
@@ -227,7 +227,7 @@ app.get("/api/queue/next", async (req, res) => {
 
   const next: any = department
     ? await (await db.prepare(sql)).get(department)
-    : await db.execute(sql);
+    : await db.get(sql);
 
   if (!next)
     return res.status(404).json({ error: "No callers currently waiting" });

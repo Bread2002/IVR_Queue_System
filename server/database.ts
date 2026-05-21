@@ -27,7 +27,7 @@ async function initializeDatabase() {
   `);
 
   // Check if the team_members table is empty, and if so, seed it with mock data
-  const [{ count }] = await db.execute(
+  const [{ count }] = await db.all(
     "SELECT COUNT(*) as count FROM team_members",
   );
 
@@ -64,7 +64,7 @@ async function initializeDatabase() {
     ];
 
     // Insert each mock team member into the database
-    for (const member of members) insert.run(...member);
+    for (const member of members) await insert.run(member);
     console.log("Database seeded with mock team members."); // Log a message indicating that seeding is complete
   }
 
@@ -80,7 +80,7 @@ async function initializeDatabase() {
   `);
 
   // Check if the callers table is empty, and if so, seed it with mock data
-  const [{ count: callerCount }] = await db.execute(
+  const [{ count: callerCount }] = await db.all(
     "SELECT COUNT(*) as count FROM callers",
   );
 
@@ -101,7 +101,7 @@ async function initializeDatabase() {
     ];
 
     // Insert each mock caller into the database
-    for (const caller of callers) await insertCaller.run(...caller);
+    for (const caller of callers) await insertCaller.run(caller);
     console.log("Database seeded with mock callers."); // Log a message indicating that seeding is complete
   }
 
@@ -125,7 +125,7 @@ async function initializeDatabase() {
   `);
 
   // Check if the call_queue table is empty, and if so, seed it with mock data
-  const [{ count: queueCount }] = await db.execute(
+  const [{ count: queueCount }] = await db.all(
     "SELECT COUNT(*) as count FROM call_queue",
   );
 
@@ -187,7 +187,7 @@ async function initializeDatabase() {
     ];
 
     // Insert each mock call into the database
-    for (const call of mockCalls) await insertCall.run(...call);
+    for (const call of mockCalls) await insertCall.run(call);
     console.log("Database seeded with mock call queue."); // Log a message indicating that seeding is complete
   }
 }
