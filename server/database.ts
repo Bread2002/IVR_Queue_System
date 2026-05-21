@@ -11,7 +11,7 @@
 // const db = new Database(process.env.DB_URL || 'database.db');
 
 // Use the Turso serverless database connection
-import db from "./turso-db";
+import db from "./turso-db.ts";
 
 // Define a helper function to initialize the database
 async function initializeDatabase() {

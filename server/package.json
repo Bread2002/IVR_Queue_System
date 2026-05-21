@@ -10,7 +10,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "dependencies": {
     "@tursodatabase/serverless": "^1.2.0-pre.2",
     "better-sqlite3": "^12.10.0",

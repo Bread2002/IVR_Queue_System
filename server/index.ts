@@ -13,7 +13,7 @@ config(); // Load environment variables from .env file
 
 import express from "express";
 import cors from "cors";
-import db from "./database";
+import db from "./database.ts";
 
 type Agent = {
   id: number;
