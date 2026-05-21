@@ -283,12 +283,12 @@ app.patch("/api/queue/:id/complete", async (req, res) => {
   res.json({ call: call });
 });
 
-// Start the server and listen on the specified port
-// if (process.env.NODE_ENV === "development") {
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
-});
-// }
+// Start the server only when running locally (not in a serverless environment)
+if (process.env.NODE_ENV !== "production") {
+  app.listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`);
+  });
+}
 
-// Export the Express application for use in other modules
-// export default app;
+// Export the Express application for use in Vercel Serverless Functions
+export default app;

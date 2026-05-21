@@ -36,7 +36,9 @@ type SubmitResult = {
 }
 
 // Define a constant for the API base URL
-const API = 'http://localhost:3000'
+// In development, VITE_API_URL can point to http://localhost:3000.
+// In production (Vercel), leave it unset so requests are relative (same origin).
+const API = import.meta.env.VITE_API_URL ?? ''
 
 // Main App
 function App() {
