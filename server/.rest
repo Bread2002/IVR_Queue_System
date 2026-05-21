@@ -1,0 +1,3 @@
+PATCH http://localhost:3000/api/queue/2/verify?verified=true
+###
+PATCH http://localhost:3000/api/queue/1/complete
