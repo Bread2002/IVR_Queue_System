@@ -8,8 +8,7 @@
     "moduleDetection": "force",
     "strict": false,
     "skipLibCheck": true,
-    "allowImportingTsExtensions": true,
-    "noEmit": true
+    "noEmit": false
   },
   "include": ["**/*.ts"],
   "exclude": ["node_modules"]
