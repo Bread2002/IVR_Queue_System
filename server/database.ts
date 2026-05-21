@@ -193,7 +193,12 @@ async function initializeDatabase() {
 }
 
 // Initialize the database
-initializeDatabase();
+try {
+  await initializeDatabase();
+} catch (err) {
+  console.error("Database initialization failed:", err);
+  throw err; // Re-throw so the serverless function fails fast with a visible error
+}
 
 // Export the database connection for use in other modules
 export default db;
