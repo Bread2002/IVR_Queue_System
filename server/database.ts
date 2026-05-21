@@ -27,7 +27,7 @@ async function initializeDatabase() {
   `);
 
   // Check if the team_members table is empty, and if so, seed it with mock data
-  const { count } = await db.execute(
+  const [{ count }] = await db.execute(
     "SELECT COUNT(*) as count FROM team_members",
   );
 
@@ -80,7 +80,7 @@ async function initializeDatabase() {
   `);
 
   // Check if the callers table is empty, and if so, seed it with mock data
-  const { count: callerCount } = await db.execute(
+  const [{ count: callerCount }] = await db.execute(
     "SELECT COUNT(*) as count FROM callers",
   );
 
@@ -125,7 +125,7 @@ async function initializeDatabase() {
   `);
 
   // Check if the call_queue table is empty, and if so, seed it with mock data
-  const { count: queueCount } = await db.execute(
+  const [{ count: queueCount }] = await db.execute(
     "SELECT COUNT(*) as count FROM call_queue",
   );
 
