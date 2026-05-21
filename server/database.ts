@@ -192,13 +192,13 @@ async function initializeDatabase() {
   }
 }
 
-// Initialize the database
-try {
-  await initializeDatabase();
-} catch (err) {
+// Kick off initialization immediately and export the promise so callers can
+// await it before handling requests. Using a promise instead of top-level await
+// keeps this module compatible with CommonJS environments (e.g. Jest / ts-jest).
+export const initPromise: Promise<void> = initializeDatabase().catch((err) => {
   console.error("Database initialization failed:", err);
-  throw err; // Re-throw so the serverless function fails fast with a visible error
-}
+  throw err;
+});
 
 // Export the database connection for use in other modules
 export default db;

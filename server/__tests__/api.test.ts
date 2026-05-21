@@ -6,18 +6,27 @@
 
 // Import supertest
 import request from 'supertest'
-// Import the Express app from the server index file
-const app = require('../index')
+// Import the Express app and db from the server
+import app from '../index.js'
+import db, { initPromise } from '../database.js'
+
+// Wait for the in-memory SQLite database to be created and seeded before any test runs
+beforeAll(() => initPromise)
+
+// Close the SQLite connection cleanly after all tests complete
+afterAll(async () => {
+  await db.close()
+})
 
 // Outline a test suite for accessing the list of departments
 describe('GET /api/departments', () => {
   it('returns an array of departments', async () => {
     const res = await request(app).get('/api/departments')
     expect(res.status).toBe(200)
-    expect(Array.isArray(res.body.departments)).toBe(true)
-    expect(res.body.departments).toContain('Sales')
-    expect(res.body.departments).toContain('Support')
-    expect(res.body.departments).toContain('Billing')
+    expect(Array.isArray(res.body)).toBe(true)
+    expect(res.body).toContain('Sales')
+    expect(res.body).toContain('Support')
+    expect(res.body).toContain('Billing')
   })
 })
 
@@ -27,10 +36,10 @@ describe('GET /api/queue', () => {
   it('returns an array of call objects', async () => {
     const res = await request(app).get('/api/queue')
     expect(res.status).toBe(200)
-    expect(Array.isArray(res.body.calls)).toBe(true)
+    expect(Array.isArray(res.body)).toBe(true)
 
-    if (res.body.calls.length > 0) {
-      const call = res.body.calls[0]
+    if (res.body.length > 0) {
+      const call = res.body[0]
       expect(call).toHaveProperty('id')
       expect(call).toHaveProperty('status')
       expect(call).toHaveProperty('department')
@@ -41,7 +50,7 @@ describe('GET /api/queue', () => {
   it('filters by ?status= so only matching entries are returned', async () => {
     const res = await request(app).get('/api/queue?status=waiting')
     expect(res.status).toBe(200)
-    for (const call of res.body.calls) {
+    for (const call of res.body) {
       expect(call.status).toBe('waiting')
     }
   })
@@ -55,12 +64,12 @@ describe('POST /api/queue', () => {
       .send({ accountNumber: 'TEST-001', department: 'Sales', issue: 'Unit test call' })
 
     expect(res.status).toBe(200)
-    expect(res.body).toHaveProperty('call')
+    expect(res.body).toHaveProperty('id')
     expect(res.body).toHaveProperty('position')
     expect(res.body).toHaveProperty('estimated_wait')
     expect(typeof res.body.position).toBe('number')
-    expect(res.body.call.department).toBe('Sales')
-    expect(res.body.call.status).toBe('waiting')
+    expect(res.body.department).toBe('Sales')
+    expect(res.body.status).toBe('waiting')
   })
 })
 
@@ -71,9 +80,9 @@ describe('GET /api/queue/next', () => {
     expect([200, 404]).toContain(res.status)
 
     if (res.status === 200) {
-      expect(res.body.call).toHaveProperty('account_number')
-      expect(res.body.call).toHaveProperty('assigned_agent_name')
-      expect(res.body.call.status).toBe('waiting')
+      expect(res.body).toHaveProperty('account_number')
+      expect(res.body).toHaveProperty('assigned_agent_name')
+      expect(res.body.status).toBe('waiting')
     }
   })
 })
@@ -86,12 +95,12 @@ describe('PATCH /api/queue/:id/verify', () => {
       .post('/api/queue')
       .send({ accountNumber: 'TEST-002', department: 'Billing', issue: 'Verify test' })
 
-    const id = post.body.call.id
+    const id = post.body.id
 
     const res = await request(app).patch(`/api/queue/${id}/verify?verified=true`)
     expect(res.status).toBe(200)
     expect(res.body.verified).toBe(true)
-    expect(res.body.call.status).toBe('in-progress')
+    expect(res.body.status).toBe('in-progress')
   })
 })
 
@@ -101,13 +110,13 @@ describe('PATCH /api/queue/:id/complete', () => {
   it('moves all waiting calls to in-progress', async () => {
     // Get all waiting calls and filter to only TEST entries
     const waiting = await request(app).get('/api/queue?status=waiting')
-    const testCalls = waiting.body.calls.filter((call: any) => call.account_number.includes('TEST'))
+    const testCalls = waiting.body.filter((call: any) => call.account_number.includes('TEST'))
 
     for (const call of testCalls) {
       // Verify each call to move it to in-progress
       const res = await request(app).patch(`/api/queue/${call.id}/verify?verified=true`)
       expect(res.status).toBe(200)
-      expect(res.body.call.status).toBe('in-progress')
+      expect(res.body.status).toBe('in-progress')
     }
   })
 
@@ -115,13 +124,13 @@ describe('PATCH /api/queue/:id/complete', () => {
   it('moves all in-progress calls to completed', async () => {
     // Get all in-progress calls and filter to only TEST entries
     const inProgress = await request(app).get('/api/queue?status=in-progress')
-    const testCalls = inProgress.body.calls.filter((call: any) => call.account_number.includes('TEST'))
+    const testCalls = inProgress.body.filter((call: any) => call.account_number.includes('TEST'))
 
     for (const call of testCalls) {
       // Complete each call
       const res = await request(app).patch(`/api/queue/${call.id}/complete`)
       expect(res.status).toBe(200)
-      expect(res.body.call.status).toBe('completed')
+      expect(res.body.status).toBe('completed')
     }
   })
 })

@@ -11,9 +11,9 @@
 import { config } from "dotenv";
 config(); // Load environment variables from .env file
 
-import express from "express";
+import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
-import db from "./database.js";
+import db, { initPromise as dbReady } from "./database.js";
 
 type Agent = {
   id: number;
@@ -30,6 +30,13 @@ const port = process.env.PORT || 3000;
 // Set up middleware for CORS and JSON parsing
 app.use(cors({ origin: "*" }));
 app.use(express.json());
+
+// Block all requests until the database has finished initializing.
+// The promise resolves once on first boot; every subsequent await is instant.
+app.use(async (_req: Request, _res: Response, next: NextFunction) => {
+  await dbReady;
+  next();
+});
 
 // Define a helper function to find the best available agent based on department, issue keywords, and caller tier
 async function findAgent(
@@ -113,7 +120,7 @@ app.get("/api/hello", async (_, res) => {
 
 // Define a route for the API endpoint that returns all team members from the database
 app.get("/api/team", async (_, res) => {
-  res.json({ team: await db.all("SELECT * FROM team_members") });
+  res.json(await db.all("SELECT * FROM team_members"));
 });
 
 // Define a route for the API endpoint that returns all unique departments from the team members in the database
@@ -121,7 +128,7 @@ app.get("/api/departments", async (_, res) => {
   const rows = await db.all(
     "SELECT DISTINCT department FROM team_members ORDER BY department",
   );
-  res.json({ departments: rows.map((r: any) => r.department) });
+  res.json(rows.map((r: any) => r.department));
 });
 
 // Define a route for the API endpoint that returns caller information
@@ -130,7 +137,7 @@ app.get("/api/callers/:accountNumber", async (req, res) => {
     await db.prepare("SELECT * FROM callers WHERE account_number = ?")
   ).get(req.params.accountNumber);
   if (!caller) return res.status(404).json({ error: "Caller not found" });
-  res.json({ caller });
+  res.json(caller);
 });
 
 // Define a route for the API endpoint that allows adding a new call to the queue
@@ -165,7 +172,7 @@ app.post("/api/queue", async (req, res) => {
   ).get(result.lastInsertRowid);
   const position = await getPosition(call.id);
 
-  res.json({ call, position, estimated_wait: position * 4 });
+  res.json({ ...call, position, estimated_wait: position * 4 });
 });
 
 // Define a route for the API endpoint that returns the current call queue
@@ -194,7 +201,7 @@ app.get("/api/queue", async (req, res) => {
     };
   });
 
-  res.json({ calls: await Promise.all(enriched) });
+  res.json(await Promise.all(enriched));
 });
 
 // Define a route for the API endpoint that returns the next caller in the queue (read-only)
@@ -231,7 +238,7 @@ app.get("/api/queue/next", async (req, res) => {
 
   if (!next)
     return res.status(404).json({ error: "No callers currently waiting" });
-  res.json({ call: next });
+  res.json(next);
 });
 
 // Define a route for the API endpoint that allows verifying a call (write access)
@@ -265,7 +272,7 @@ app.patch("/api/queue/:id/verify", async (req, res) => {
   const updated: any = await (
     await db.prepare("SELECT * FROM call_queue WHERE id = ?")
   ).get(id);
-  res.json({ verified, call: updated });
+  res.json({ ...updated, verified });
 });
 
 // Define a route for the API endpoint that allows marking an in-progress call as completed (bypass IVR verify flow)
@@ -280,7 +287,7 @@ app.patch("/api/queue/:id/complete", async (req, res) => {
     await db.prepare("SELECT * FROM call_queue WHERE id = ?")
   ).get(id);
   if (!call) return res.status(404).json({ error: "Call not found" });
-  res.json({ call: call });
+  res.json(call);
 });
 
 // Start the server only when running locally (not in a serverless environment)

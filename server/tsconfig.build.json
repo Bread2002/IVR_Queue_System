@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    // Don't include jest types in the production build
+    "types": ["node"]
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/__tests__/**",
+    "test-db.ts",
+    "jest.config.cjs"
+  ]
+}
