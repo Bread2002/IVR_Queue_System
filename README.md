@@ -57,6 +57,7 @@ IVR_Queue_System/
    ```env
    TURSO_DATABASE_URL=libsql://your-db.turso.io
    TURSO_AUTH_TOKEN=your-auth-token
+   NODE_ENV=production
    ```
 
 3. Deploy — Vercel picks up `vercel.json` automatically. Your API base URL will be something like `https://your-project.vercel.app`
@@ -77,6 +78,8 @@ IVR_Queue_System/
    VITE_AUTH0_DOMAIN=your-tenant.us.auth0.com
    VITE_AUTH0_CLIENT_ID=your-client-id
    ```
+
+   > ⚠️ **Note:** For local development, set `VITE_API_URL=http://localhost:3000` to point at the server running locally instead.
 
 3. Run:
    ```bash
