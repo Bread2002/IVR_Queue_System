@@ -49,59 +49,76 @@ IVR_Queue_System/
 
 ---
 
-### 🖥️ Server
+### ☁️ Deploy the Server (Vercel + Turso)
+
+1. Push the `server/` directory to its own GitHub repo (or as a Vercel project root)
+
+2. In your Vercel project dashboard, add the following environment variables:
+   ```env
+   TURSO_DATABASE_URL=libsql://your-db.turso.io
+   TURSO_AUTH_TOKEN=your-auth-token
+   ```
+
+3. Deploy — Vercel picks up `vercel.json` automatically. Your API base URL will be something like `https://your-project.vercel.app`
+
+---
+
+### 🌐 Run the Client
 
 1. Install dependencies:
+   ```bash
+   cd client
+   npm install
+   ```
 
+2. Create a `.env` file pointing at your live Vercel API:
+   ```env
+   VITE_API_URL=https://your-project.vercel.app
+   VITE_AUTH0_DOMAIN=your-tenant.us.auth0.com
+   VITE_AUTH0_CLIENT_ID=your-client-id
+   ```
+
+3. Run:
+   ```bash
+   npm run dev
+   ```
+
+---
+
+### 🖥️ Running the Server Locally (optional)
+
+If you need to test the API locally before deploying:
+
+1. Install dependencies:
    ```bash
    cd server
    npm install
    ```
 
 2. Create a `.env` file:
-
    ```env
    TURSO_DATABASE_URL=libsql://your-db.turso.io
    TURSO_AUTH_TOKEN=your-auth-token
    ```
 
-3. Run locally:
+3. Build and start:
    ```bash
-   npm run dev
+   npm run build
+   npm start
    ```
-   Server starts on `http://localhost:3000`.
+   Server starts on `http://localhost:3000`. Set `VITE_API_URL=http://localhost:3000` in the client `.env` to point at it.
 
----
+#### Mock Data / Seeding
 
-### 🌐 Client
+On first boot, the server automatically creates the database tables and seeds them with mock data if they're empty. This works against your Turso database, so **running locally is also a convenient way to populate a fresh Turso instance before deploying to Vercel**.
 
-1. Install dependencies:
+The following mock data is seeded:
 
-   ```bash
-   cd client
-   npm install
-   ```
+- **Team Members** — 6 agents across Sales, Support, and Billing (e.g. `Alex Johnson - Sales Lead`, `Marcus Williams - Support Manager`)
+- **Callers** — 5 accounts (`ACC-1001` through `ACC-1005`) with mixed tiers: standard, premium, and VIP
+- **Call Queue** — 3 pre-populated waiting calls, one per department, with realistic timestamps and agent assignments
 
-2. Create a `.env` file:
-
-   ```env
-   VITE_API_URL=http://localhost:3000
-   VITE_AUTH0_DOMAIN=your-tenant.us.auth0.com
-   VITE_AUTH0_CLIENT_ID=your-client-id
-   ```
-
-   > ⚠️ **Note:** In production, leave `VITE_API_URL` unset so requests are relative to the same Vercel origin.
-
-3. Run locally:
-   ```bash
-   npm run dev
-   ```
-
----
-
-### ☁️ Deploying to Vercel
-
-Both the `client/` and `server/` subdirectories can be deployed as separate Vercel projects. Add the environment variables above to each project's Vercel dashboard before deploying.
+> ⚠️ **Note:** Seeding only runs when the tables are empty. To re-seed, drop the tables from your Turso dashboard and restart the server.
 
 ---
 
@@ -115,6 +132,5 @@ Both the `client/` and `server/` subdirectories can be deployed as separate Verc
 | `POST`  | `/api/queue`                  | Submit a new call; returns position and estimated wait           |
 | `GET`   | `/api/queue`                  | Get the full queue (filterable by `?status=waiting,in-progress`) |
 | `GET`   | `/api/queue/next`             | Peek at the next waiting call (filterable by `?department=`)     |
-| `PATCH` | `/api/queue/:id/answer`       | Mark a call as in-progress                                       |
 | `PATCH` | `/api/queue/:id/verify`       | Verify (`?verified=true`) or reject (`?verified=false`) a call   |
 | `PATCH` | `/api/queue/:id/complete`     | Mark an in-progress call as completed                            |

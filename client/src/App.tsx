@@ -6,6 +6,7 @@
 
 // Import React, Auth0, and necessary utilities
 import { useState, useEffect } from "react";
+import type { SyntheticEvent } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import "./App.css";
 import { parseTs, waitedMinutes } from "./utils";
@@ -86,7 +87,7 @@ function App() {
   }
 
   // Define a helper function to handle form submission for joining the queue
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: SyntheticEvent<HTMLFormElement>) {
     e.preventDefault(); // Prevent the default form submission behavior
     setLoading(true); // Set submission loading state to true while submitting the form
     setSubmitResult(null); // Clear any previous submission results
@@ -110,7 +111,7 @@ function App() {
 
   // Define a helper function to handle answering a call from the dashboard
   async function handleAnswer(id: number) {
-    await fetch(`${API}/api/queue/${id}/answer`, { method: "PATCH" }); // Submit a PATCH request to the API to mark the call as answered
+    await fetch(`${API}/api/queue/${id}/verify?verified=true`, { method: "PATCH" }); // Submit a PATCH request to the API to mark the call as answered
     loadQueue(); // Reload the queue data to reflect the updated status of the call
   }
 
