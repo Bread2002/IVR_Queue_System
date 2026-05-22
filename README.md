@@ -115,7 +115,7 @@ If you need to test the API locally before deploying:
    npm run build
    npm start
    ```
-   Server starts on `http://localhost:3000`. Set `VITE_API_URL=http://localhost:3000` in the client `.env` to point at it.
+   > ⚠️ **Note:** Server starts on `http://localhost:3000`. Set `VITE_API_URL=http://localhost:3000` in the client `.env` to point at it.
 
 #### Mock Data / Seeding
 
