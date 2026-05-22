@@ -54,6 +54,7 @@ IVR_Queue_System/
 1. Push the `server/` directory to its own GitHub repo (or as a Vercel project root)
 
 2. In your Vercel project dashboard, add the following environment variables:
+
    ```env
    TURSO_DATABASE_URL=libsql://your-db.turso.io
    TURSO_AUTH_TOKEN=your-auth-token
@@ -67,12 +68,14 @@ IVR_Queue_System/
 ### 🌐 Run the Client
 
 1. Install dependencies:
+
    ```bash
    cd client
    npm install
    ```
 
 2. Create a `.env` file pointing at your live Vercel API:
+
    ```env
    VITE_API_URL=https://your-project.vercel.app
    VITE_AUTH0_DOMAIN=your-tenant.us.auth0.com
@@ -93,15 +96,18 @@ IVR_Queue_System/
 If you need to test the API locally before deploying:
 
 1. Install dependencies:
+
    ```bash
    cd server
    npm install
    ```
 
 2. Create a `.env` file:
+
    ```env
    TURSO_DATABASE_URL=libsql://your-db.turso.io
    TURSO_AUTH_TOKEN=your-auth-token
+   NODE_ENV=development
    ```
 
 3. Build and start:

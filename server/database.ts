@@ -5,11 +5,6 @@
 //              This module creates necessary tables (team_members, callers, call_queue) and seeds them with mock data if they are empty.
 //              It uses better-sqlite3 for SQLite interactions.
 
-// Import and initialize the SQLite database connection
-// const Database = require('better-sqlite3');
-// import Database from 'better-sqlite3';
-// const db = new Database(process.env.DB_URL || 'database.db');
-
 // Use the Turso serverless database connection
 import db from "./turso-db.js";
 
