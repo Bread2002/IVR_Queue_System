@@ -42,7 +42,7 @@ IVR_Queue_System/
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 24+
 - A [Turso](https://turso.tech) database (free tier works)
 - An [Auth0](https://auth0.com) application (for agent login)
 - A [Vercel](https://vercel.com) account (for deployment)
